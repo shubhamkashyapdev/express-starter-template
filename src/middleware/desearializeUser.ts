@@ -27,7 +27,7 @@ export default async function desearializeUser(
   if (decoded) {
     const locals: any = {};
     locals.user = decoded;
-    req.locals = { ...req?.locals, ...locals };
+    res.locals = { ...res?.locals, ...locals };
     return next();
   }
 
@@ -37,9 +37,9 @@ export default async function desearializeUser(
     if (newAccessToken) {
       res.setHeader('x-access-token', newAccessToken);
       const result = verfiyJwt(newAccessToken);
-      const locals = {};
+      const locals: any = {};
       locals.user = decoded;
-      req.locals = { ...req?.locals, ...locals };
+      res.locals = { ...res?.locals, ...locals };
 
       return next();
     }
