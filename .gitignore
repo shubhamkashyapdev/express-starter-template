@@ -32,3 +32,4 @@ __test__/*
 
 # config keys
 /config/default.ts
+/config/test.ts
