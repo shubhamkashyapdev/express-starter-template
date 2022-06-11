@@ -9,7 +9,7 @@ export async function createUser(
 ) {
   try {
     const user = await UserModel.create(input);
-    return omit(user.toJSON(), 'password');
+    return omit(user, 'password');
   } catch (err: any) {
     throw new Error(err.message);
   }

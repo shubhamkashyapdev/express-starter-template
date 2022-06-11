@@ -6,5 +6,7 @@ module.exports = {
   verbose: true,
   forceExit: true,
   silent: false,
-  // clearMocks: true,
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
 };
