@@ -1,5 +1,6 @@
 export default {
   port: 8080,
+  origin: 'your frontend application url',
   dbUri: '',
   saltWorkFactor: 10,
   accessTokenTtl: '15m',

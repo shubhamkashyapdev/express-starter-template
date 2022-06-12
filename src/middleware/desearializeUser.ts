@@ -8,39 +8,42 @@ export default async function desearializeUser(
   res: Response,
   next: NextFunction,
 ) {
-  const accessToken = get(req, 'headers.authorization', '').replace(
-    /^Bearer\s/,
-    '',
-  ); // remove the bearer word from token
+  const accessToken =
+    get(req, 'cookies.accessToken') ||
+    get(req, 'headers.authorization', '').replace(/^Bearer\s/, ''); // remove the bearer word from token
 
-  const refreshToken = get(req, 'headers.x-refresh-token', '').replace(
-    /^Bearer\s/,
-    '',
-  ); // remove the bearer word from token
-
-  if (!accessToken) {
+  const refreshToken =
+    get(req, 'cookies.refreshToken') ||
+    get(req, 'headers.x-refresh-token', '').replace(/^Bearer\s/, ''); // remove the bearer word from token
+  if (!accessToken && !refreshToken) {
     return next();
   }
+
   // verify access token
   const { decoded, expired } = verfiyJwt(accessToken);
 
   if (decoded) {
-    const locals: any = {};
-    locals.user = decoded;
-    res.locals = { ...res?.locals, ...locals };
+    res.locals.user = decoded;
     return next();
   }
 
-  if (expired && refreshToken) {
+  if (expired || refreshToken) {
     // reissue the token
     const newAccessToken = await reissueAccessToken(refreshToken);
+
     if (newAccessToken) {
       res.setHeader('x-access-token', newAccessToken);
-      const result = verfiyJwt(newAccessToken);
-      const locals: any = {};
-      locals.user = decoded;
-      res.locals = { ...res?.locals, ...locals };
-
+      const { decoded } = await verfiyJwt(newAccessToken);
+      console.log({ decoded });
+      res.locals.user = decoded;
+      res.cookie('accessToken', newAccessToken, {
+        maxAge: 900000, // 15min
+        httpOnly: true,
+        domain: 'localhost', // @todo - set to your domain in prod
+        path: '/',
+        sameSite: 'strict',
+        secure: false, //@todo - set true in prod
+      });
       return next();
     }
   }

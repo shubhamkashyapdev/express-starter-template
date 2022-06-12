@@ -16,3 +16,7 @@ export async function createUserHandler(
     res.status(409).send(err.message);
   }
 }
+
+export async function currentUserHandler(req: Request, res: Response) {
+  return res.send(res.locals.user);
+}

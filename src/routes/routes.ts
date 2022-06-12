@@ -8,7 +8,10 @@ import {
   deleteSessionHandler,
   getUserSessionsHandler,
 } from '../controllers/session.controller';
-import { createUserHandler } from '../controllers/user.controller';
+import {
+  createUserHandler,
+  currentUserHandler,
+} from '../controllers/user.controller';
 // Schemas
 import { createSessionSchema } from '../schema/session.shema';
 import { createUserSchema } from '../schema/user.schema';
@@ -35,6 +38,8 @@ function routes(app: Application) {
   });
 
   app.post('/api/users', validateResource(createUserSchema), createUserHandler);
+
+  app.get('/api/me', requireUser, currentUserHandler);
 
   app.post(
     '/api/sessions',

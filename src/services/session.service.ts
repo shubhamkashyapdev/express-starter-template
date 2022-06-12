@@ -21,11 +21,7 @@ export async function updateSession(
   return SessionModel.updateOne(query, update);
 }
 
-export async function reissueAccessToken({
-  refreshToken,
-}: {
-  refreshToken: string;
-}) {
+export async function reissueAccessToken(refreshToken: string) {
   const { decoded } = verfiyJwt(refreshToken);
 
   if (!decoded || !get(decoded, 'session')) {
