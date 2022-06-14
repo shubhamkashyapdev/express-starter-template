@@ -4,14 +4,28 @@ import {
   QueryOptions,
   UpdateQuery,
 } from 'mongoose';
+import logger from '../utils/logger';
 import ProductModel, { ProductDocument } from '../models/product.model';
+import { databaseResponseTimeHistogram } from '../utils/metrics';
 
 export async function createProduct(
   input: DocumentDefinition<
     Omit<ProductDocument, 'createdAt' | 'updatedAt' | 'productId'>
   >,
 ) {
-  return ProductModel.create(input);
+  const metriclabels = {
+    operation: 'createProduct',
+  };
+  const timer = databaseResponseTimeHistogram.startTimer();
+  try {
+    const result = await ProductModel.create(input);
+    timer({ ...metriclabels, success: 200 });
+    return result;
+  } catch (err: any) {
+    timer({ ...metriclabels, success: 200 });
+    logger.error(err.message);
+    throw new Error(err.message);
+  }
 }
 
 export async function findProduct(
